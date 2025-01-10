@@ -13,8 +13,8 @@ resource "hcloud_server" "webforge" {
     "env" : "prod"
     "source" : "tf-tahoe-lafs-core"
   }
-  ssh_keys    = [for k, v in local.ssh_keys : "tf-${v.name}"]
-  user_data   = <<EOF
+  ssh_keys  = [for k, v in local.ssh_keys : "tf-${v.name}"]
+  user_data = <<EOF
 #cloud-config
 
 runcmd:
@@ -22,7 +22,7 @@ runcmd:
 EOF
   # Wait for the ssh key(s)
   depends_on = [
-     hcloud_ssh_key.ssh_keys
+    hcloud_ssh_key.ssh_keys
   ]
   lifecycle {
     ignore_changes = [
@@ -47,7 +47,7 @@ resource "hcloud_rdns" "webforge_ipv6" {
 
 # System A and AAAA records
 resource "gandi_livedns_record" "webforge_ipv4" {
-  name = "${hcloud_server.webforge.name}"
+  name = hcloud_server.webforge.name
   type = "A"
   values = [
     hcloud_server.webforge.ipv4_address
@@ -57,7 +57,7 @@ resource "gandi_livedns_record" "webforge_ipv4" {
 }
 
 resource "gandi_livedns_record" "webforge_ipv6" {
-  name = "${hcloud_server.webforge.name}"
+  name = hcloud_server.webforge.name
   type = "AAAA"
   values = [
     hcloud_server.webforge.ipv6_address
