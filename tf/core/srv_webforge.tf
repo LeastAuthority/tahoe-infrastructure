@@ -31,3 +31,50 @@ EOF
     ]
   }
 }
+
+# System PTR records
+resource "hcloud_rdns" "webforge_ipv4" {
+  server_id  = hcloud_server.webforge.id
+  ip_address = hcloud_server.webforge.ipv4_address
+  dns_ptr    = "${hcloud_server.webforge.name}.${data.gandi_domain.tl-org.name}"
+}
+
+resource "hcloud_rdns" "webforge_ipv6" {
+  server_id  = hcloud_server.webforge.id
+  ip_address = hcloud_server.webforge.ipv6_address
+  dns_ptr    = "${hcloud_server.webforge.name}.${data.gandi_domain.tl-org.name}"
+}
+
+# System A and AAAA records
+resource "gandi_livedns_record" "webforge_ipv4" {
+  name = "${hcloud_server.webforge.name}"
+  type = "A"
+  values = [
+    hcloud_server.webforge.ipv4_address
+  ]
+  ttl  = 3600
+  zone = data.gandi_domain.tl-org.name
+}
+
+resource "gandi_livedns_record" "webforge_ipv6" {
+  name = "${hcloud_server.webforge.name}"
+  type = "AAAA"
+  values = [
+    hcloud_server.webforge.ipv6_address
+  ]
+  ttl  = 3600
+  zone = data.gandi_domain.tl-org.name
+}
+
+# Functional CNAMES records
+resource "gandi_livedns_record" "webforge_aliases" {
+  for_each = toset(["forge", "preview", "live"])
+
+  name = each.value
+  type = "CNAME"
+  values = [
+    "${hcloud_server.webforge.name}.${data.gandi_domain.tl-org.name}."
+  ]
+  ttl  = 3600
+  zone = data.gandi_domain.tl-org.name
+}
