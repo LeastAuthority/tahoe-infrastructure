@@ -1,0 +1,32 @@
+# Workflow to continuously integrate and deploy OpenToFu plan for
+# the core resources of Tahoe-LAFS (e.g.: DNS, self-hosted vps, ...)
+name: ToFu - core
+concurrency: tf-core_state
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/_tf.yml'
+      - '.github/workflows/tf-core.yml'
+      - 'tf/core/**'
+  pull_request:
+    paths:
+      - '.github/workflows/_tf.yml'
+      - '.github/workflows/tf-core.yml'
+      - 'tf/core/**'
+  workflow_dispatch:
+
+jobs:
+  call-workflow-passing-data:
+    # Call the re-usable ToFu workflow
+    uses: ./.github/workflows/_tf.yml
+    with:
+      tf_version: '1.9.0'
+      tf_dir: tf/core
+      apply_on_branch: 'main'
+      gandi_url: 'https://api.sandbox.gandi.net'
+    secrets:
+      gandi_token: ${{ secrets.GANDI_TOKEN }}
+      hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
