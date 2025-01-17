@@ -96,9 +96,9 @@ jobs:
       run: |
         # Process the plan to verify the presence of some data
         # which can be used later to make additional checks
-        terraform show -no-color tf_plan.out > tf_plan.log 2> >(tee tf_plan.err >&2) && ret=0 || ret=$?
+        tofu show -no-color tf_plan.out > tf_plan.log 2> >(tee tf_plan.err >&2) && ret=0 || ret=$?
         # Export the plan in json too
-        terraform show -json tf_plan.out > tf_plan.json
+        tofu show -json tf_plan.out > tf_plan.json
         # Extract current state from the plan for later comparison
         unzip tf_plan.out tfstate
         # Extract data from temp files and export them as outputs for next steps
